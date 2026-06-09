@@ -137,3 +137,54 @@ Explanation:
 =================================================
 
 """
+def process_records(records):
+    clean_records = []
+    error_log = []
+
+    for i, record in enumerate(records):
+        try:
+            clean = {
+                "name": record["name"],
+                "age": int(record["age"]),
+                "score": float(record["score"])
+            }
+
+        except (KeyError, TypeError) as e:
+            error_log.append((i, type(e).__name__, str(e)))
+
+        except ValueError as e:
+            error_log.append((i, type(e).__name__, str(e)))
+
+        else:
+            clean_records.append(clean)
+
+    return clean_records, error_log
+
+
+def process_strict(records):
+    clean_records, error_log = process_records(records)
+
+    if error_log:
+        raise RuntimeError(f"{len(error_log)} record(s) failed")
+
+    return clean_records
+
+
+# Driver Code
+records = [
+    {"name": "Alice", "age": "25", "score": "88.5"},
+    {"name": "Bob", "age": "abc", "score": "70"},
+    {"name": "Carol", "age": "30"},
+    "not a dict",
+    {"name": "Dan", "age": "40", "score": "55.5"}
+]
+
+clean_records, error_log = process_records(records)
+
+print("Clean Records:", clean_records)
+print("Error Log:", error_log)
+
+try:
+    process_strict(records)
+except RuntimeError as e:
+    print("Strict mode raised:", e)
